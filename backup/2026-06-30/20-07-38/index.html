@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+<title>PactSpire Chronicles</title>
+<style>
+:root {
+ --bg: #f5f0e8;
+ --bg-card: #ffffff;
+ --text: #1a1a1a;
+ --text-secondary: #5a5a5a;
+ --accent: #8b6914;
+ --accent-dim: #c4a44a;
+ --border: #d4cbb8;
+ --shadow: rgba(0,0,0,0.06);
+ --bar-bg: #e0d8c8;
+ --bar-fill: #8b6914;
+ --chapter-bg: #ffffff;
+ --chapter-hover: #f8f4ea;
+ --grey-bg: #e8e4dc;
+ --grey-text: #9a9588;
+ --floating-bg: rgba(255,255,255,0.18);
+ --divider: #d4cbb8;
+ --btn-bg: #f0ebe0;
+ --btn-hover: #e0d8c8;
+ --font-body: 'Georgia', 'Times New Roman', serif;
+}
+
+[data-theme="dark"] {
+ --bg: #0d0d14;
+ --bg-card: #151520;
+ --text: #d8d4c8;
+ --text-secondary: #8a8578;
+ --accent: #c4a44a;
+ --accent-dim: #8b6914;
+ --border: #2a2830;
+ --shadow: rgba(0,0,0,0.3);
+ --bar-bg: #1e1e2a;
+ --bar-fill: #c4a44a;
+ --chapter-bg: #151520;
+ --chapter-hover: #1e1e2a;
+ --grey-bg: #1a1a25;
+ --grey-text: #5a5555;
+ --floating-bg: rgba(13,13,20,0.35);
+ --divider: #2a2830;
+ --btn-bg: #1e1e2a;
+ --btn-hover: #2a2830;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 17px; scroll-behavior: smooth; }
+
+body {
+ font-family: var(--font-body);
+ background: var(--bg);
+ color: var(--text);
+ line-height: 1.75;
+ min-height: 100vh;
+ transition: background 0.3s, color 0.3s;
+}
+
+.container {
+ max-width: 100%;
+ margin: 0 auto;
+ padding: 20px 0 100px;
+}
+
+/* === Floating Top Bar, iOS Liquid Glass === */
+.floating-bar {
+ position: fixed; top: 12px; left: 16px; right: 16px; z-index: 100;
+ overflow: hidden;
+ height: 56px;
+ border-radius: 9999px;
+ background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 100%);
+ backdrop-filter: blur(20px) saturate(180%);
+ -webkit-backdrop-filter: blur(20px) saturate(180%);
+ padding: 6px 10px;
+ display: flex; align-items: center; gap: 6px;
+ justify-content: space-evenly;
+ flex-wrap: nowrap;
+ transition: background 0.35s, box-shadow 0.35s;
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.08),
+ 0 2px 8px rgba(0,0,0,0.04),
+ inset 0 1px 0 rgba(255,255,255,0.7),
+ inset 0 -1px 0 rgba(255,255,255,0.15);
+}
+.floating-bar.scrolled {
+ background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+}
+[data-theme="dark"] .floating-bar {
+ background: linear-gradient(180deg, rgba(45,45,55,0.18) 0%, rgba(30,30,40,0.06) 50%, rgba(18,18,26,0.02) 100%);
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.25),
+ 0 2px 8px rgba(0,0,0,0.15),
+ inset 0 1px 0 rgba(255,255,255,0.18),
+ inset 0 -1px 0 rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .floating-bar.scrolled {
+ background: linear-gradient(180deg, rgba(45,45,55,0.22) 0%, rgba(30,30,40,0.08) 50%, rgba(18,18,26,0.03) 100%);
+}
+.floating-bar .home-btn {
+ width: 40px; height: 40px; min-width: 40px;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%; font-size: 1rem; font-weight: bold;
+ color: var(--accent);
+ background: rgba(255,255,255,0.06);
+ border: none; cursor: pointer;
+ font-family: var(--font-body); padding: 0;
+ white-space: nowrap;
+ transition: background 0.25s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+ backdrop-filter: blur(10px);
+ -webkit-backdrop-filter: blur(10px);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.05),
+ inset 0 1px 0 rgba(255,255,255,0.4);
+ text-shadow: none;
+}
+.floating-bar .home-btn:hover {
+ background: rgba(255,255,255,0.12);
+ transform: scale(1.08);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.08),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.floating-bar .bar-btn svg,
+.floating-bar .bar-btn img {
+ /* no shadow, minimal glass aesthetic */
+}
+.floating-bar .sep { color: var(--border); user-select: none; opacity: 0.5; }
+[data-theme="dark"] .floating-bar .sep {
+ opacity: 0.35;
+}
+.floating-bar .bar-btn {
+ width: 40px; height: 40px; min-width: 40px;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%;
+ background: rgba(255,255,255,0.06);
+ border: none;
+ color: var(--text);
+ cursor: pointer; font-family: var(--font-body);
+ font-size: 0.85rem; padding: 0;
+ transition: background 0.25s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+ backdrop-filter: blur(10px);
+ -webkit-backdrop-filter: blur(10px);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.05),
+ inset 0 1px 0 rgba(255,255,255,0.4);
+ text-shadow: none;
+}
+[data-theme="dark"] .floating-bar .bar-btn {
+ background: rgba(255,255,255,0.04);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.2),
+ inset 0 1px 0 rgba(255,255,255,0.09);
+ text-shadow: none;
+}
+[data-theme="dark"] .floating-bar .home-btn {
+ background: rgba(255,255,255,0.04);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.2),
+ inset 0 1px 0 rgba(255,255,255,0.09);
+ text-shadow: none;
+}
+[data-theme="dark"] .floating-bar .home-btn:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.3),
+ inset 0 1px 0 rgba(255,255,255,0.13);
+}
+.floating-bar .bar-btn:hover {
+ background: rgba(255,255,255,0.12);
+ transform: scale(1.08);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.08),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+[data-theme="dark"] .floating-bar .bar-btn:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.3),
+ inset 0 1px 0 rgba(255,255,255,0.13);
+}
+.floating-bar .bar-btn.active {
+ background: rgba(255,255,255,0.15);
+ color: var(--accent);
+ box-shadow:
+ 0 0 12px rgba(139,105,20,0.25),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.floating-bar .font-btn {
+ font-weight: bold; letter-spacing: -0.02em;
+ font-size: 0.92rem;
+}
+.floating-bar .theme-btn {
+ font-size: 1rem;
+}
+.floating-bar .controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+
+/* === Font Panel, iOS Liquid Glass === */
+.font-panel {
+ position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-12px);
+ z-index: 99;
+ background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.02) 100%);
+ backdrop-filter: blur(20px) saturate(160%);
+ -webkit-backdrop-filter: blur(20px) saturate(160%);
+ border: none;
+ border-radius: 24px;
+ padding: 16px 18px;
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.12),
+ 0 2px 8px rgba(0,0,0,0.06),
+ inset 0 1px 0 rgba(255,255,255,0.55),
+ inset 0 -1px 2px rgba(0,0,0,0.04);
+ opacity: 0; pointer-events: none;
+ transition: opacity 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ max-width: 560px; width: calc(100vw - 32px);
+ max-height: 60vh; overflow-y: auto;
+}
+[data-theme="dark"] .font-panel {
+ background: linear-gradient(180deg, rgba(45,45,55,0.25) 0%, rgba(30,30,40,0.10) 50%, rgba(18,18,26,0.02) 100%);
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.50),
+ 0 2px 8px rgba(0,0,0,0.30),
+ inset 0 1px 0 rgba(255,255,255,0.08),
+ inset 0 -1px 2px rgba(0,0,0,0.15);
+}
+.font-panel.visible {
+ opacity: 1; pointer-events: auto;
+ transform: translateX(-50%) translateY(0);
+}
+.font-panel .fp-category {
+ font-size: 0.7rem; font-weight: bold; color: var(--accent-dim);
+ text-transform: uppercase; letter-spacing: 0.08em;
+ margin: 10px 0 6px 4px;
+}
+.font-panel .fp-category:first-child { margin-top: 0; }
+.font-panel .fp-options {
+ display: flex; flex-wrap: wrap; gap: 6px;
+}
+.font-panel .fp-opt {
+ padding: 6px 14px; border-radius: 20px;
+ border: none;
+ background: rgba(255,255,255,0.06);
+ color: var(--text);
+ cursor: pointer; font-size: 0.8rem;
+ transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ white-space: nowrap;
+ user-select: none;
+ box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+ text-shadow: 0 0 8px rgba(255,255,255,0.8), 0 0 16px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.3);
+}
+[data-theme="dark"] .font-panel .fp-opt {
+ background: rgba(255,255,255,0.06);
+ box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+ text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.4);
+}
+.font-panel .fp-opt:hover {
+ background: rgba(255,255,255,0.11);
+ transform: scale(1.04);
+ box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 2px 6px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] .font-panel .fp-opt:hover {
+ background: rgba(255,255,255,0.11);
+ box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 2px 6px rgba(0,0,0,0.30);
+}
+.font-panel .fp-opt.selected {
+ background: var(--accent);
+ color: #fff;
+ border-color: var(--accent);
+}
+
+/* === Auto-Scroll Button & Menu === */
+.floating-bar .auto-scroll-btn {
+ width: 40px; height: 40px; min-width: 40px;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%; font-size: 1rem;
+ color: var(--text);
+ background: rgba(255,255,255,0.06);
+ border: none; cursor: pointer;
+ font-family: var(--font-body); padding: 0;
+ transition: background 0.25s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+ backdrop-filter: blur(10px);
+ -webkit-backdrop-filter: blur(10px);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.05),
+ inset 0 1px 0 rgba(255,255,255,0.4);
+ text-shadow: none;
+}
+.floating-bar .auto-scroll-btn:hover {
+ background: rgba(255,255,255,0.12);
+ transform: scale(1.08);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.08),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.floating-bar .auto-scroll-btn.active {
+ background: rgba(255,255,255,0.15);
+ color: var(--accent);
+ box-shadow:
+ 0 0 12px rgba(139,105,20,0.25),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+[data-theme="dark"] .floating-bar .auto-scroll-btn {
+ background: rgba(255,255,255,0.04);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.2),
+ inset 0 1px 0 rgba(255,255,255,0.09);
+ text-shadow: none;
+}
+[data-theme="dark"] .floating-bar .auto-scroll-btn:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.3),
+ inset 0 1px 0 rgba(255,255,255,0.13);
+}
+[data-theme="dark"] .floating-bar .auto-scroll-btn.active {
+ background: rgba(255,255,255,0.12);
+ color: var(--accent);
+ box-shadow:
+ 0 0 12px rgba(196,164,74,0.3),
+ inset 0 1px 0 rgba(255,255,255,0.13);
+}
+
+.auto-scroll-menu {
+ position: fixed; top: 80px; right: 16px; z-index: 110;
+ background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.01) 100%);
+ backdrop-filter: blur(20px) saturate(180%);
+ -webkit-backdrop-filter: blur(20px) saturate(180%);
+ border-radius: 20px;
+ padding: 12px 14px;
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.08),
+ 0 2px 8px rgba(0,0,0,0.04),
+ inset 0 1px 0 rgba(255,255,255,0.55),
+ inset 0 -1px 0 rgba(255,255,255,0.10);
+ opacity: 0; pointer-events: none;
+ transform: translateY(-8px);
+ transition: opacity 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.auto-scroll-menu.visible {
+ opacity: 1; pointer-events: auto;
+ transform: translateY(0);
+}
+.auto-scroll-menu .asm-btn {
+ padding: 8px 16px; border-radius: 16px;
+ border: none; font-family: var(--font-body); font-size: 0.82rem;
+ cursor: pointer; white-space: nowrap;
+ background: rgba(255,255,255,0.08);
+ color: var(--text);
+ transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ box-shadow: none;
+ text-shadow: none;
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+}
+.auto-scroll-menu .asm-btn:hover {
+ background: rgba(255,255,255,0.15);
+ transform: scale(1.03);
+}
+.auto-scroll-menu .asm-speed-row {
+ display: flex; gap: 10px; align-items: center;
+}
+.auto-scroll-menu .asm-speed {
+ width: 40px; height: 40px; min-width: 40px; padding: 0;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%; font-size: 1.1rem; font-weight: bold;
+ background: rgba(255,255,255,0.08);
+ border: none; color: var(--text); cursor: pointer;
+ font-family: var(--font-body);
+ transition: background 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+ box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+ text-shadow: none;
+}
+.auto-scroll-menu .asm-speed:hover {
+ background: rgba(255,255,255,0.15);
+ transform: scale(1.08);
+ box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .auto-scroll-menu {
+ background: linear-gradient(180deg, rgba(45,45,55,0.15) 0%, rgba(30,30,40,0.06) 50%, rgba(18,18,26,0.01) 100%);
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.35),
+ 0 2px 8px rgba(0,0,0,0.20),
+ inset 0 1px 0 rgba(255,255,255,0.12),
+ inset 0 -1px 0 rgba(255,255,255,0.04);
+}
+[data-theme="dark"] .auto-scroll-menu .asm-btn {
+ background: rgba(255,255,255,0.05);
+ box-shadow: none;
+ text-shadow: none;
+}
+[data-theme="dark"] .auto-scroll-menu .asm-btn:hover {
+ background: rgba(255,255,255,0.10);
+}
+[data-theme="dark"] .auto-scroll-menu .asm-speed {
+ background: rgba(255,255,255,0.05);
+ box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+ text-shadow: none;
+}
+[data-theme="dark"] .auto-scroll-menu .asm-speed:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+
+/* === Font Dropdown Menu (replaces .font-panel) === */
+.font-dropdown-menu {
+ position: fixed; top: 80px; right: 16px; z-index: 109;
+ background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.01) 100%);
+ backdrop-filter: blur(20px) saturate(180%);
+ -webkit-backdrop-filter: blur(20px) saturate(180%);
+ border-radius: 20px;
+ padding: 12px 14px;
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.08),
+ 0 2px 8px rgba(0,0,0,0.04),
+ inset 0 1px 0 rgba(255,255,255,0.55),
+ inset 0 -1px 0 rgba(255,255,255,0.10);
+ opacity: 0; pointer-events: none;
+ transform: translateY(-8px);
+ transition: opacity 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ max-width: 340px; width: calc(100vw - 32px);
+ max-height: 60vh; overflow-y: auto;
+}
+.font-dropdown-menu.visible {
+ opacity: 1; pointer-events: auto;
+ transform: translateY(0);
+}
+[data-theme="dark"] .font-dropdown-menu {
+ background: linear-gradient(180deg, rgba(45,45,55,0.15) 0%, rgba(30,30,40,0.06) 50%, rgba(18,18,26,0.01) 100%);
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.35),
+ 0 2px 8px rgba(0,0,0,0.20),
+ inset 0 1px 0 rgba(255,255,255,0.12),
+ inset 0 -1px 0 rgba(255,255,255,0.04);
+}
+.font-dropdown-menu .fdm-category {
+ font-size: 0.68rem; font-weight: bold; color: var(--accent-dim);
+ text-transform: uppercase; letter-spacing: 0.08em;
+ margin: 8px 0 6px 6px;
+}
+.font-dropdown-menu .fdm-category:first-child { margin-top: 0; }
+.font-dropdown-menu .fdm-row {
+ display: flex; flex-wrap: wrap; gap: 6px;
+}
+.font-dropdown-menu .fdm-opt {
+ padding: 6px 14px; border-radius: 20px;
+ border: none; font-family: var(--font-body); font-size: 0.8rem;
+ cursor: pointer; white-space: nowrap;
+ background: rgba(255,255,255,0.08);
+ color: var(--text);
+ transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ box-shadow: none;
+ text-shadow: none;
+ user-select: none;
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-opt {
+ background: rgba(255,255,255,0.05);
+ box-shadow: none;
+ text-shadow: none;
+}
+.font-dropdown-menu .fdm-opt:hover {
+ background: rgba(255,255,255,0.15);
+ transform: scale(1.04);
+ box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-opt:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.font-dropdown-menu .fdm-opt.selected {
+ background: var(--accent);
+ color: #fff;
+ box-shadow: 0 0 8px rgba(139,105,20,0.2);
+}
+
+/* === Font size adjuster inside dropdown === */
+.font-dropdown-menu .fdm-sep {
+ height: 1px;
+ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+ margin: 6px 4px;
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-sep {
+ background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+.font-dropdown-menu .fdm-fontsize-row {
+ display: flex; align-items: center; gap: 10px;
+ justify-content: center;
+ padding: 2px 0;
+}
+.font-dropdown-menu .fdm-size-btn {
+ width: 36px; height: 36px;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%;
+ border: none; cursor: pointer;
+ background: rgba(255,255,255,0.08);
+ color: var(--text);
+ font-family: var(--font-body);
+ font-weight: bold;
+ transition: background 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+ box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+ user-select: none;
+}
+.font-dropdown-menu .fdm-size-btn:hover {
+ background: rgba(255,255,255,0.15);
+ transform: scale(1.08);
+ box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.font-dropdown-menu .fdm-size-btn:first-child {
+ font-size: 0.7rem;
+}
+.fdm-size-plus {
+ font-size: 1rem;
+}
+.font-dropdown-menu .fdm-size-val {
+ font-size: 0.8rem; font-weight: bold;
+ color: var(--text);
+ min-width: 36px; text-align: center;
+ user-select: none;
+ text-shadow: none;
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-size-btn {
+ background: rgba(255,255,255,0.05);
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-size-btn:hover {
+ background: rgba(255,255,255,0.10);
+}
+[data-theme="dark"] .font-dropdown-menu .fdm-size-val {
+ color: var(--text);
+}
+
+/* === Align Button & Dropdown === */
+.floating-bar .align-btn {
+ width: 40px; height: 40px; min-width: 40px;
+ display: flex; align-items: center; justify-content: center;
+ border-radius: 50%; font-size: 1rem;
+ color: var(--text);
+ background: rgba(255,255,255,0.06);
+ border: none; cursor: pointer;
+ font-family: var(--font-body); padding: 0;
+ transition: background 0.25s, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s;
+ backdrop-filter: blur(10px);
+ -webkit-backdrop-filter: blur(10px);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.05),
+ inset 0 1px 0 rgba(255,255,255,0.4);
+ text-shadow: none;
+}
+.floating-bar .align-btn svg { fill: var(--text); filter: drop-shadow(0 0 6px rgba(255,255,255,0.7)); }
+.floating-bar .align-btn:hover {
+ background: rgba(255,255,255,0.12);
+ transform: scale(1.08);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.08),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.floating-bar .align-btn.active {
+ background: rgba(255,255,255,0.15);
+ color: var(--accent);
+ box-shadow:
+ 0 0 12px rgba(139,105,20,0.25),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.floating-bar .align-btn.active svg { fill: #fff; }
+[data-theme="dark"] .floating-bar .align-btn {
+ background: rgba(255,255,255,0.04);
+ box-shadow:
+ 0 1px 3px rgba(0,0,0,0.2),
+ inset 0 1px 0 rgba(255,255,255,0.09);
+ text-shadow: none;
+}
+[data-theme="dark"] .floating-bar .align-btn:hover {
+ background: rgba(255,255,255,0.10);
+ box-shadow:
+ 0 3px 12px rgba(0,0,0,0.3),
+ inset 0 1px 0 rgba(255,255,255,0.13);
+}
+[data-theme="dark"] .floating-bar .align-btn.active {
+ background: rgba(255,255,255,0.15);
+ color: var(--accent);
+ box-shadow:
+ 0 0 12px rgba(139,105,20,0.25),
+ inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.align-dropdown-menu {
+ position: fixed; top: 80px; right: 16px; z-index: 108;
+ background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.01) 100%);
+ backdrop-filter: blur(20px) saturate(180%);
+ -webkit-backdrop-filter: blur(20px) saturate(180%);
+ border-radius: 20px;
+ padding: 10px 14px;
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.08),
+ 0 2px 8px rgba(0,0,0,0.04),
+ inset 0 1px 0 rgba(255,255,255,0.55),
+ inset 0 -1px 0 rgba(255,255,255,0.10);
+ opacity: 0; pointer-events: none;
+ transform: translateY(-8px);
+ transition: opacity 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ display: flex; flex-direction: column; gap: 8px; align-items: center;
+}
+.align-dropdown-menu.visible {
+ opacity: 1; pointer-events: auto;
+ transform: translateY(0);
+}
+[data-theme="dark"] .align-dropdown-menu {
+ background: linear-gradient(180deg, rgba(45,45,55,0.15) 0%, rgba(30,30,40,0.06) 50%, rgba(18,18,26,0.01) 100%);
+ box-shadow:
+ 0 8px 32px rgba(0,0,0,0.35),
+ 0 2px 8px rgba(0,0,0,0.20),
+ inset 0 1px 0 rgba(255,255,255,0.12),
+ inset 0 -1px 0 rgba(255,255,255,0.04);
+}
+.align-dropdown-menu .adm-btn {
+ padding: 8px 16px; border-radius: 16px;
+ border: none; font-family: var(--font-body); font-size: 0.82rem;
+ cursor: pointer; white-space: nowrap;
+ background: rgba(255,255,255,0.08);
+ color: var(--text);
+ transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+ box-shadow: none;
+ text-shadow: none;
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+ width: 100%; min-width: 110px;
+}
+.align-dropdown-menu .adm-btn:hover {
+ background: rgba(255,255,255,0.15);
+ transform: scale(1.03);
+}
+.align-dropdown-menu .adm-btn.selected {
+ background: var(--accent);
+ color: #fff;
+ box-shadow: 0 0 8px rgba(139,105,20,0.2);
+}
+[data-theme="dark"] .align-dropdown-menu .adm-btn {
+ background: rgba(255,255,255,0.05);
+ box-shadow: none;
+ text-shadow: none;
+}
+[data-theme="dark"] .align-dropdown-menu .adm-btn:hover {
+ background: rgba(255,255,255,0.10);
+}
+[data-theme="dark"] .align-dropdown-menu .adm-btn.selected {
+ background: var(--accent);
+ color: #fff;
+ box-shadow: 0 0 8px rgba(196,164,74,0.3);
+}
+@media (max-width: 480px) {
+ .floating-bar .align-btn { width: 34px; height: 34px; min-width: 34px; }
+ .align-dropdown-menu { top: 72px; right: 12px; }
+}
+
+/* === Chapter Label in Floating Bar === */
+.floating-bar .chapter-label {
+ display: none;
+ font-size: 0.8rem;
+ font-weight: bold;
+ color: var(--accent);
+ white-space: nowrap;
+ padding: 0 6px 0 2px;
+ text-shadow: 0 0 8px rgba(255,255,255,0.8), 0 0 16px rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.3);
+ letter-spacing: 0.02em;
+ line-height: 56px;
+}
+.floating-bar .chapter-label.visible { display: inline; }
+[data-theme="dark"] .floating-bar .chapter-label {
+ text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.4);
+}
+@media (max-width: 480px) {
+ .floating-bar .chapter-label {
+ font-size: 0.72rem;
+ line-height: 50px;
+ }
+}
+/* === Progress Bar, inside floating bar top edge === */
+.floating-bar .bar-progress {
+ position: absolute; top: 0; left: 0; height: 3px;
+ background: var(--bar-fill);
+ transition: width 0.1s linear, background 0.3s;
+ border-radius: 9999px 9999px 0 0;
+ pointer-events: none;
+}
+
+/* === Home Page === */
+.cover-img {
+ width: 100%; max-width: 400px; display: block;
+ margin: 70px auto 24px; border-radius: 12px;
+ box-shadow: 0 8px 32px var(--shadow);
+ border: 1px solid var(--border);
+}
+.page-title {
+ text-align: center; font-size: 1.8rem; font-weight: bold;
+ color: var(--accent); margin-bottom: 4px;
+ line-height: 1.3;
+}
+.page-subtitle {
+ text-align: center; font-size: 0.95rem; color: var(--text-secondary);
+ margin-bottom: 28px;
+ font-style: italic;
+}
+.summary-box {
+ background: var(--bg-card); border: 1px solid var(--border);
+ border-radius: 10px; padding: 20px 18px; margin-bottom: 32px;
+ box-shadow: 0 2px 12px var(--shadow);
+ font-size: 0.92rem; line-height: 1.7;
+}
+.summary-box h2 {
+ font-size: 1.15rem; color: var(--accent); margin-bottom: 12px;
+ font-weight: bold;
+}
+.summary-box p { margin-bottom: 10px; }
+.summary-box p:last-child { margin-bottom: 0; }
+.summary-box .protagonists {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+ margin-top: 14px;
+}
+.summary-box .protagonist {
+ background: var(--btn-bg); border-radius: 8px; padding: 12px;
+ border: 1px solid var(--border);
+}
+.summary-box .protagonist strong { display: block; color: var(--accent); margin-bottom: 4px; }
+
+.chapter-list-title {
+ font-size: 1.2rem; color: var(--accent); margin-bottom: 16px;
+ font-weight: bold;
+}
+.chapter-item {
+ display: flex; align-items: center; gap: 14px;
+ padding: 14px 16px; margin-bottom: 8px;
+ border-radius: 10px; border: 1px solid var(--border);
+ background: var(--chapter-bg);
+ cursor: pointer; transition: all 0.2s;
+ box-shadow: 0 1px 4px var(--shadow);
+}
+.chapter-item:hover { background: var(--chapter-hover); transform: translateY(-1px); }
+.chapter-item.available .ch-num {
+ background: var(--accent); color: #fff; width: 38px; height: 38px;
+ border-radius: 50%; display: flex; align-items: center; justify-content: center;
+ font-weight: bold; font-size: 0.9rem; flex-shrink: 0;
+}
+.chapter-item.available .ch-info { flex: 1; }
+.chapter-item.available .ch-title {
+ font-weight: bold; font-size: 0.95rem; color: var(--text);
+}
+.chapter-item.available .ch-meta {
+ font-size: 0.78rem; color: var(--text-secondary);
+}
+.chapter-item.unavailable {
+ cursor: default; opacity: 0.55;
+ background: var(--grey-bg);
+}
+.chapter-item.unavailable:hover { transform: none; background: var(--grey-bg); }
+.chapter-item.unavailable .ch-num {
+ background: var(--grey-text); color: var(--bg);
+ width: 38px; height: 38px; border-radius: 50%;
+ display: flex; align-items: center; justify-content: center;
+ font-weight: bold; font-size: 0.9rem; flex-shrink: 0;
+}
+.chapter-item.unavailable .ch-title {
+ font-weight: bold; font-size: 0.95rem; color: var(--grey-text);
+}
+.chapter-item.unavailable .ch-badge {
+ font-size: 0.7rem; background: var(--grey-text); color: var(--bg);
+ padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 2px;
+}
+
+.act-header {
+ font-size: 0.85rem; font-weight: bold; color: var(--accent-dim);
+ text-transform: uppercase; letter-spacing: 0.08em;
+ margin: 20px 0 10px; padding-left: 4px;
+}
+
+/* === Chapter Page === */
+.chapter-page { margin-top: 60px; }
+.chapter-page .ch-header {
+ text-align: center; margin-bottom: 30px; padding-bottom: 18px;
+ border-bottom: 1px solid var(--divider);
+}
+.chapter-page .ch-header h1 {
+ font-size: 1.5rem; color: var(--accent); font-weight: bold; line-height: 1.35;
+}
+.chapter-page .ch-header .ch-subtitle {
+ font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;
+}
+.chapter-page .chapter-cover {
+ display: block;
+ max-width: 100%;
+ height: auto;
+ margin: 0 auto 30px;
+ border-radius: 8px;
+ box-shadow: 0 4px 16px var(--shadow);
+}
+@media (max-width: 480px) {
+ .chapter-page .chapter-cover {
+ margin: 0 auto 20px;
+ border-radius: 6px;
+ }
+}
+.chapter-page .ch-content {
+ font-size: 1rem; line-height: 1.85; padding: 0;
+}
+.chapter-page .ch-content p {
+ margin-bottom: 1.2em; text-indent: 0;
+ padding-left: 0; padding-right: 0;
+}
+.chapter-page .ch-content .scene-break {
+ text-align: center; color: var(--accent-dim);
+ margin: 2em 0; font-size: 1.2rem; letter-spacing: 0.3em;
+}
+
+.ch-nav {
+ display: flex; gap: 12px; margin-top: 40px; padding-top: 20px;
+ border-top: 1px solid var(--divider);
+}
+.ch-nav button {
+ flex: 1; padding: 12px; border: 1px solid var(--border);
+ border-radius: 8px; background: var(--btn-bg); color: var(--text);
+ cursor: pointer; font-family: var(--font-body); font-size: 0.9rem;
+ transition: background 0.2s;
+}
+.md-table {
+ width: 100%; border-collapse: collapse; margin: 1.2em 0;
+ font-size: 0.88rem; border: 1px solid var(--border);
+}
+.md-table th, .md-table td {
+ padding: 8px 12px; border: 1px solid var(--border);
+ text-align: left;
+}
+.md-table th {
+ background: var(--btn-bg); font-weight: bold; color: var(--accent);
+}
+
+.ch-nav button:hover { background: var(--btn-hover); }
+.ch-nav button:disabled { opacity: 0.35; cursor: default; }
+
+/* === About Page === */
+.about-page { margin-top: 60px; }
+.about-page .about-hero {
+ text-align: center; margin-bottom: 36px; padding-bottom: 20px;
+ border-bottom: 1px solid var(--divider);
+}
+.about-page .about-hero h1 {
+ font-size: 1.6rem; color: var(--accent); font-weight: bold; line-height: 1.35;
+}
+.about-page .about-hero .about-subtitle {
+ font-size: 0.88rem; color: var(--text-secondary); margin-top: 6px;
+ font-style: italic;
+}
+.about-card {
+ background: var(--bg-card); border: 1px solid var(--border);
+ border-radius: 12px; padding: 28px 28px; margin-bottom: 28px;
+ box-shadow: 0 4px 18px var(--shadow);
+ font-size: 0.95rem; line-height: 1.8;
+}
+.about-card h2 {
+ font-size: 1.15rem; color: var(--accent); margin-bottom: 14px;
+ font-weight: bold; padding-bottom: 8px;
+ border-bottom: 1px solid var(--divider);
+}
+.about-card h3 {
+ font-size: 1.0rem; color: var(--accent-dim); margin: 18px 0 8px;
+ font-weight: bold;
+}
+.about-card p { margin-bottom: 12px; }
+.about-card p:last-child { margin-bottom: 0; }
+.about-protagonists {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px;
+}
+.about-protagonist {
+ background: var(--btn-bg); border-radius: 10px; padding: 16px;
+ border: 1px solid var(--border);
+}
+.about-protagonist .ap-name { display: block; font-weight: bold; color: var(--accent); font-size: 1.0rem; margin-bottom: 2px; }
+.about-protagonist .ap-class { display: block; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px; }
+.about-protagonist p { font-size: 0.85rem; margin-bottom: 0; }
+.about-seasons { margin-top: 8px; }
+.about-season {
+ background: var(--btn-bg); border: 1px solid var(--border);
+ border-radius: 10px; padding: 14px 18px; margin-bottom: 12px;
+}
+.about-season .as-name { font-weight: bold; color: var(--accent); font-size: 0.95rem; display: block; margin-bottom: 4px; }
+.about-season .as-range { font-size: 0.78rem; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+.about-season p { font-size: 0.85rem; margin-bottom: 0; }
+.about-chapter-grid {
+ display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 8px;
+}
+.about-ch-row {
+ display: flex; align-items: baseline; gap: 12px;
+ padding: 8px 12px; border-radius: 8px;
+ background: var(--btn-bg); border: 1px solid var(--border);
+}
+.about-ch-row .ac-num {
+ width: 30px; height: 30px; min-width: 30px;
+ border-radius: 50%; background: var(--accent); color: #fff;
+ display: flex; align-items: center; justify-content: center;
+ font-weight: bold; font-size: 0.78rem;
+}
+.about-ch-row .ac-info { flex: 1; }
+.about-ch-row .ac-title { font-weight: bold; font-size: 0.9rem; color: var(--text); }
+.about-ch-row .ac-desc { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+.about-back-btn {
+ display: inline-flex; align-items: center; gap: 6px;
+ padding: 12px 24px; border: 1px solid var(--border);
+ border-radius: 10px; background: var(--btn-bg); color: var(--text);
+ cursor: pointer; font-family: var(--font-body); font-size: 0.9rem;
+ margin-top: 8px; transition: background 0.2s, transform 0.2s;
+}
+.about-back-btn:hover { background: var(--btn-hover); transform: translateX(-3px); }
+@media (max-width: 480px) {
+ .about-protagonists { grid-template-columns: 1fr; }
+ .about-card { padding: 18px 14px; }
+}
+
+/* === Mobile optimizations === */
+@media (max-width: 480px) {
+ html { font-size: 15px; }
+ .container { padding: 14px 0 80px; }
+ .floating-bar { height: 50px; padding: 5px 8px; gap: 4px; top: 10px; }
+ .floating-bar .bar-btn { width: 34px; height: 34px; min-width: 34px; font-size: 0.78rem; }
+ .floating-bar .home-btn { width: 34px; height: 34px; min-width: 34px; font-size: 0.9rem; }
+ .floating-bar .auto-scroll-btn { width: 34px; height: 34px; min-width: 34px; font-size: 0.9rem; }
+ .auto-scroll-menu { top: 70px; right: 12px; }
+ .font-panel { top: 70px; }
+ .page-title { font-size: 1.5rem; }
+ .summary-box .protagonists { grid-template-columns: 1fr; }
+ .cover-img { margin-top: 56px; max-width: 100%; }
+ .chapter-item { padding: 12px 12px; gap: 10px; }
+ .chapter-item .ch-num { width: 32px; height: 32px; font-size: 0.8rem; }
+}
+
+/* === 22 Font families === */
+body.font-georgia { --font-body: 'Georgia', 'Times New Roman', serif; }
+body.font-merriweather { --font-body: 'Merriweather', 'Georgia', serif; }
+body.font-lora { --font-body: 'Lora', 'Georgia', serif; }
+body.font-playfair { --font-body: 'Playfair Display', 'Georgia', serif; }
+body.font-baskerville { --font-body: 'Libre Baskerville', 'Georgia', serif; }
+body.font-ebgaramond { --font-body: 'EB Garamond', 'Georgia', serif; }
+body.font-crimson { --font-body: 'Crimson Text', 'Georgia', serif; }
+body.font-spectral { --font-body: 'Spectral', 'Georgia', serif; }
+body.font-literata { --font-body: 'Literata', 'Georgia', serif; }
+
+body.font-segoe { --font-body: 'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif; }
+body.font-inter { --font-body: 'Inter', 'Segoe UI', sans-serif; }
+body.font-roboto { --font-body: 'Roboto', 'Segoe UI', sans-serif; }
+body.font-opensans { --font-body: 'Open Sans', 'Segoe UI', sans-serif; }
+body.font-montserrat { --font-body: 'Montserrat', 'Segoe UI', sans-serif; }
+body.font-lato { --font-body: 'Lato', 'Segoe UI', sans-serif; }
+body.font-poppins { --font-body: 'Poppins', 'Segoe UI', sans-serif; }
+body.font-raleway { --font-body: 'Raleway', 'Segoe UI', sans-serif; }
+
+body.font-cascadia { --font-body: 'Cascadia Code', 'Consolas', monospace; }
+body.font-jetbrains { --font-body: 'JetBrains Mono', 'Consolas', monospace; }
+body.font-sourcecode { --font-body: 'Source Code Pro', 'Consolas', monospace; }
+body.font-ibmplex { --font-body: 'IBM Plex Mono', 'Consolas', monospace; }
+body.font-firacode { --font-body: 'Fira Code', 'Consolas', monospace; }
+
+/* === Transition for page changes === */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* === Misc === */
+.back-to-top {
+ position: fixed; bottom: 24px; right: 18px; width: 42px; height: 42px;
+ border-radius: 50%; background: var(--btn-bg); border: 1px solid var(--border);
+ color: var(--text); font-size: 1.2rem; cursor: pointer; z-index: 150;
+ display: flex; align-items: center; justify-content: center;
+ box-shadow: 0 2px 8px var(--shadow);
+ transition: background 0.2s, opacity 0.3s;
+ opacity: 0; pointer-events: none;
+}
+.back-to-top.visible { opacity: 0.85; pointer-events: auto; }
+.back-to-top:hover { background: var(--btn-hover); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,400;0,700;1,400&family=Raleway:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;700&family=Spectral:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="font-georgia" data-theme="light">
+
+
+
+<!-- Floating Bar -->
+<div class="floating-bar" id="floatingBar">
+ <div class="bar-progress" id="progressBar"></div>
+ <span id="chapterLabel" class="chapter-label"></span>
+ <button class="home-btn" onclick="navigate('home')" title="Home">&#8962;</button>
+ <span class="sep">|</span>
+ <button class="bar-btn font-btn" id="fontBtn" onclick="toggleFontDropdown()" title="Change font">Aa</button>
+ <button class="bar-btn theme-btn" onclick="toggleTheme()" title="Toggle dark/light mode" id="themeBtn">&#9790;</button>
+ <button class="align-btn" id="alignBtn" onclick="toggleAlignMenu()" title="Text alignment">
+ <svg width="18" height="16" viewBox="0 0 18 16"><rect x="4" y="1" width="13" height="2.5" rx="1"/><rect x="4" y="5" width="9" height="2.5" rx="1"/><rect x="4" y="9" width="13" height="2.5" rx="1"/><rect x="0" y="0.5" width="2.5" height="15" rx="1"/></svg>
+ </button>
+ <button class="auto-scroll-btn" id="autoScrollBtn" onclick="toggleAutoScrollMenu()" title="Auto-scroll">&#9654;</button>
+</div>
+<div class="font-dropdown-menu" id="fontDropdownMenu">
+ <div class="fdm-category">Serif</div>
+ <div class="fdm-row">
+ <button class="fdm-opt" data-font="georgia" onclick="selectFont('georgia',this)">Georgia</button>
+ <button class="fdm-opt" data-font="merriweather" onclick="selectFont('merriweather',this)">Merriweather</button>
+ <button class="fdm-opt" data-font="lora" onclick="selectFont('lora',this)">Lora</button>
+ <button class="fdm-opt" data-font="playfair" onclick="selectFont('playfair',this)">Playfair</button>
+ <button class="fdm-opt" data-font="baskerville" onclick="selectFont('baskerville',this)">Baskerville</button>
+ <button class="fdm-opt" data-font="ebgaramond" onclick="selectFont('ebgaramond',this)">EB Garamond</button>
+ <button class="fdm-opt" data-font="crimson" onclick="selectFont('crimson',this)">Crimson</button>
+ <button class="fdm-opt" data-font="spectral" onclick="selectFont('spectral',this)">Spectral</button>
+ <button class="fdm-opt" data-font="literata" onclick="selectFont('literata',this)">Literata</button>
+ </div>
+ <div class="fdm-category">Sans</div>
+ <div class="fdm-row">
+ <button class="fdm-opt" data-font="segoe" onclick="selectFont('segoe',this)">Segoe UI</button>
+ <button class="fdm-opt" data-font="inter" onclick="selectFont('inter',this)">Inter</button>
+ <button class="fdm-opt" data-font="roboto" onclick="selectFont('roboto',this)">Roboto</button>
+ <button class="fdm-opt" data-font="opensans" onclick="selectFont('opensans',this)">Open Sans</button>
+ <button class="fdm-opt" data-font="montserrat" onclick="selectFont('montserrat',this)">Montserrat</button>
+ <button class="fdm-opt" data-font="lato" onclick="selectFont('lato',this)">Lato</button>
+ <button class="fdm-opt" data-font="poppins" onclick="selectFont('poppins',this)">Poppins</button>
+ <button class="fdm-opt" data-font="raleway" onclick="selectFont('raleway',this)">Raleway</button>
+ </div>
+ <div class="fdm-category">Mono</div>
+ <div class="fdm-row">
+ <button class="fdm-opt" data-font="cascadia" onclick="selectFont('cascadia',this)">Cascadia</button>
+ <button class="fdm-opt" data-font="jetbrains" onclick="selectFont('jetbrains',this)">JetBrains</button>
+ <button class="fdm-opt" data-font="sourcecode" onclick="selectFont('sourcecode',this)">Source Code</button>
+ <button class="fdm-opt" data-font="ibmplex" onclick="selectFont('ibmplex',this)">IBM Plex</button>
+ <button class="fdm-opt" data-font="firacode" onclick="selectFont('firacode',this)">Fira Code</button>
+ <div class="fdm-sep"></div>
+ <div class="fdm-category">Font Size</div>
+ <div class="fdm-fontsize-row">
+ <button class="fdm-size-btn" onclick="adjustFontSize(-1)" title="Smaller">A</button>
+ <span class="fdm-size-val" id="fdmSizeVal">17px</span>
+ <button class="fdm-size-btn fdm-size-plus" onclick="adjustFontSize(1)" title="Larger">A</button>
+ </div>
+</div>
+</div>
+
+<!-- Auto-Scroll Menu -->
+<div class="auto-scroll-menu" id="autoScrollMenu">
+ <button class="asm-btn asm-toggle" id="asmStartStop" onclick="startAutoScroll()">Start Auto-Scroll</button>
+ <div class="asm-speed-row">
+ <button class="asm-btn asm-speed" id="asmSlower" onclick="adjustScrollSpeed(-20)">&#8722;</button>
+ <button class="asm-btn asm-speed" id="asmFaster" onclick="adjustScrollSpeed(20)">+</button>
+ </div>
+</div>
+
+<!-- Align Dropdown Menu -->
+<div class="align-dropdown-menu" id="alignDropdownMenu">
+ <button class="adm-btn" onclick="setAlignment('left',this)" data-align="left">Align Left</button>
+ <button class="adm-btn" onclick="setAlignment('center',this)" data-align="center">Align Center</button>
+ <button class="adm-btn" onclick="setAlignment('right',this)" data-align="right">Align Right</button>
+ <button class="adm-btn" onclick="setAlignment('justify',this)" data-align="justify">Justify</button>
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Top">&#8593;</button>
+
+<div class="container" id="appContainer">
+ <!-- Pages rendered by JS -->
+</div>
+
+<script>
+// === CHAPTER METADATA ===
+const BASE_PATH = 'chapters/';
+const FILE_PREFIX = 'fiorgard-chapter-';
+const FILE_SUFFIX = '.md';
+
+const chapters = [
+ { num: 1, act: "ACT I, SPRING: The Arriving", title: "The Arriving" },
+ { num: 2, act: "", title: "The First Clash" },
+ { num: 3, act: "", title: "The Challenge" },
+ { num: 4, act: "", title: "The Quiet Lessons" },
+ { num: 5, act: "", title: "Pact-Planting" },
+ { num: 6, act: "ACT II, SUMMER/AUTUMN: The Burning", title: "Field Exercise" },
+ { num: 7, act: "", title: "Forced Proximity" },
+ { num: 8, act: "", title: "The Alchemical-Stage Duel" },
+ { num: 9, act: "", title: "Solstice Vigil" },
+ { num: 10, act: "", title: "The Letter" },
+ { num: 11, act: "", title: "Harvest Binding" },
+ { num: 12, act: "ACT III, WINTER: The Breaking", title: "Oath-Remembered" },
+ { num: 13, act: "", title: "The Investigation" },
+ { num: 14, act: "", title: "The Turning" },
+ { num: 15, act: "", title: "The Headmaster's Secret" },
+ { num: 16, act: "", title: "The Stand" },
+ { num: 17, act: "", title: "Aftermath" }
+];
+
+// === MARKDOWN TO HTML (lightweight parser) ===
+function mdToHTML(md) {
+ let html = md;
+
+ // Scene breaks: *** or * * * or --- on its own line
+ html = html.replace(/^(?:\*\s*\*\s*\*|---)$/gm, '<div class="scene-break">* * *</div>');
+
+ // Headers
+ html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+ html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+ html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+ html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+ // Bold + italic combined
+ html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+ // Bold
+ html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+ // Italic
+ html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+ // Paragraphs: double newlines -> paragraphs, single newlines within paragraph kept
+ let blocks = html.split(/\n\n+/);
+ let out = [];
+ for (let block of blocks) {
+ block = block.trim();
+ if (!block) continue;
+ // Skip already-HTML blocks
+ if (block.startsWith('<div') || block.startsWith('<h')) {
+ out.push(block);
+ } else if (block.startsWith('|')) {
+ // Table, keep as raw (rendered as pre for now, or simple table)
+ let rows = block.split('\n').filter(r => r.trim() && !r.match(/^\|[\s\-:|]+$/));
+ if (rows.length > 1) {
+ let tableHTML = '<table class="md-table">';
+ let isHeader = true;
+ for (let row of rows) {
+ let cells = row.split('|').map(c => c.trim()).filter(c => c);
+ let tag = isHeader ? 'th' : 'td';
+ tableHTML += '<tr>';
+ cells.forEach(c => tableHTML += `<${tag}>${c.replace(/\*\*/g,'')}</${tag}>`);
+ tableHTML += '</tr>';
+ isHeader = false;
+ }
+ tableHTML += '</table>';
+ out.push(tableHTML);
+ }
+ } else {
+ let para = block.replace(/\n/g, '<br>');
+ out.push(`<p>${para}</p>`);
+ }
+ }
+
+ return out.join('\n');
+}
+
+// === XHR helper (works under file:// where fetch() is blocked) ===
+function xhr(method, url) {
+ return new Promise((resolve, reject) => {
+ const r = new XMLHttpRequest();
+ r.open(method, url, true);
+ r.onload = () => {
+ // status 0 = file:// protocol (Chrome/Edge), treat all methods the same
+ if (r.status >= 200 && r.status < 300 || r.status === 0) resolve(r);
+ else reject(new Error(r.status));
+ };
+ r.onerror = () => reject(new Error('network'));
+ r.send();
+ });
+}
+
+// === AUTO-DETECT CHAPTER AVAILABILITY ===
+async function detectChapters() {
+ const results = await Promise.allSettled(
+ chapters.map(ch => xhr('GET', BASE_PATH + FILE_PREFIX + ch.num + FILE_SUFFIX))
+ );
+ chapters.forEach((ch, i) => {
+ ch.done = results[i].status === 'fulfilled';
+ });
+}
+
+// === LOAD CHAPTER CONTENT ===
+let chapterCache = {};
+
+async function loadChapter(num) {
+ if (chapterCache[num]) return chapterCache[num];
+ try {
+ const resp = await xhr('GET', BASE_PATH + FILE_PREFIX + num + FILE_SUFFIX);
+ const html = mdToHTML(resp.responseText.replace(/（(?:內容由AI生成，僅供參考|内容由AI生成，仅供参考)）/g, ''));
+ chapterCache[num] = html;
+ return html;
+ } catch(e) {
+ return '<p style="color:var(--text-secondary);text-align:center;padding:40px;">This chapter is not available yet.</p>';
+ }
+}
+
+// === STATE ===
+let currentPage = 'home';
+let fontSizeRem = 17;
+
+// === INIT ===
+async function init() {
+ await detectChapters();
+ // Priority: localStorage last-read chapter > URL hash > home
+ const lastChapter = parseInt(localStorage.getItem('pactspire_lastchapter') || getCookie('pactspire_lastchapter'));
+ const lastCh = lastChapter && chapters.find(c => c.num === lastChapter && c.done);
+ if (lastCh) {
+ navigate('chapter', lastChapter);
+ } else {
+ const hash = location.hash.replace('#/', '') || 'home';
+ if (hash === 'about') {
+ navigate('about');
+ } else if (hash.startsWith('chapter/')) {
+ const chNum = parseInt(hash.replace('chapter/', ''));
+ const ch = chapters.find(c => c.num === chNum);
+ if (ch && ch.done) navigate('chapter', chNum);
+ else navigate('home');
+ } else {
+ navigate('home');
+ }
+ }
+ // Restore preferences (cookie-first for cross-session reliability)
+ const savedTheme = localStorage.getItem('pactspire_theme') || getCookie('pactspire_theme');
+ if (savedTheme === 'dark') setTheme('dark');
+ const savedFont = localStorage.getItem('pactspire_font') || getCookie('pactspire_font') || 'georgia';
+ const legacy = { serif:'georgia', sans:'segoe', mono:'cascadia' };
+ const font = legacy[savedFont] || savedFont;
+ document.body.className = document.body.className.replace(/\bfont-\S+/g, '').trim();
+ document.body.classList.add('font-' + font);
+ highlightFontPanel(font);
+ const savedSize = localStorage.getItem('pactspire_fontsize') || getCookie('pactspire_fontsize');
+ if (savedSize) { fontSizeRem = parseInt(savedSize); document.documentElement.style.fontSize = fontSizeRem + 'px'; }
+ const sizeValEl = document.getElementById('fdmSizeVal');
+ if (sizeValEl) sizeValEl.textContent = fontSizeRem + 'px';
+ const savedAlign = localStorage.getItem('pactspire_align') || getCookie('pactspire_align') || 'justify';
+ currentAlignment = savedAlign;
+ document.querySelectorAll('.align-dropdown-menu .adm-btn').forEach(b => b.classList.remove('selected'));
+ const alignOpt = document.querySelector('.align-dropdown-menu .adm-btn[data-align="' + savedAlign + '"]');
+ if (alignOpt) alignOpt.classList.add('selected');
+}
+
+async function navigate(page, chapterNum) {
+ currentPage = page;
+ if (page === 'home') {
+ location.hash = '#/';
+ renderHome();
+ updateChapterLabel(null);
+ } else if (page === 'chapter' && chapterNum) {
+ location.hash = '#/chapter/' + chapterNum;
+ await renderChapter(chapterNum);
+ updateChapterLabel(chapterNum);
+ } else if (page === 'about') {
+ location.hash = '#/about';
+ renderAbout();
+ updateChapterLabel('about');
+ }
+ window.scrollTo({top: 0, behavior: 'instant'});
+ updateProgress();
+}
+
+// === CHAPTER LABEL UPDATE ===
+function updateChapterLabel(num) {
+ const label = document.getElementById('chapterLabel');
+ if (!label) return;
+ if (num === 'about') {
+ label.textContent = 'About the Story';
+ label.classList.add('visible');
+ } else if (num) {
+ label.textContent = 'Chapter ' + num;
+ label.classList.add('visible');
+ } else {
+ label.textContent = '';
+ label.classList.remove('visible');
+ }
+}
+
+// === COVER IMAGE PATH ===
+function getCoverPath(num) {
+ return 'covers/chapter-' + num + '.png';
+}
+function setCookie(name, value, days) {
+ const d = new Date();
+ d.setTime(d.getTime() + (days||365)*86400000);
+ document.cookie = name + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+}
+function getCookie(name) {
+ const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+ return m ? decodeURIComponent(m[2]) : null;
+}
+
+// === PERSISTENCE: save to both localStorage + cookie ===
+function persist(key, value) {
+ try { localStorage.setItem(key, value); } catch(e) {}
+ setCookie(key, value);
+}
+
+// === HOME PAGE ===
+function renderHome() {
+ let actLabel = '';
+ let html = `
+ <img src="cover.png" alt="PactSpire Chronicles Cover" class="cover-img" loading="eager">
+ <h1 class="page-title">PactSpire Chronicles</h1>
+ <p class="page-subtitle">A Novel of Fiorgard</p>
+ <div class="summary-box">
+ <h2>About the Story</h2>
+ <p>In the world of <strong>Fiorgard</strong>, magic flows not from gods or bloodlines but from <em>pacts</em>, living oaths sworn between people, land, beasts, and spirits. When the ancient Emperor broke the primordial pact, every oath in the world shattered. Seven Guilds rose from the ruins to rebuild trust one vow at a time.</p>
+ <p>At the heart of this fragile order stands <strong>PactSpire</strong>, a living Academy built from accumulated student oaths, where halls shift and walls breathe. Here, at sixteen, every soul awakens to its true Class.</p>
+ <div class="protagonists">
+ <div class="protagonist">
+ <strong>Tomas Herdsson</strong>
+ <span style="font-size:0.82rem;color:var(--text-secondary)">Totemic Sentinel · Veridale</span>
+ <p style="margin-top:6px;font-size:0.82rem;">A sheep farmer's son who manifests a spectral ram guardian. Raw power, no resources. He knows one thing: how to stand in front of things and refuse to move.</p>
+ </div>
+ <div class="protagonist">
+ <strong>Flynn Wintersbloom</strong>
+ <span style="font-size:0.82rem;color:var(--text-secondary)">Cantrip Jester · Miravale</span>
+ <p style="margin-top:6px;font-size:0.82rem;">Heir to an Apothecarian dynasty who awakens as a Stage Class, a performer in a family of physicians. His improvisational magic could revolutionize battlefield medicine, if anyone let him.</p>
+ </div>
+ </div>
+ <p style="margin-top:14px;">An enemies-to-lovers Academy arc spanning three seasons: <strong>Spring</strong> (Arriving) → <strong>Summer/Autumn</strong> (Burning) → <strong>Winter</strong> (Breaking). Seven students. One Academy. A world balanced on the edge of a fracture that has never healed.</p>
+ </div>
+ <div style="text-align:center;margin-bottom:20px;">
+ <button onclick="navigate('about')" style="padding:10px 28px;border:1px solid var(--border);border-radius:10px;background:var(--btn-bg);color:var(--accent);cursor:pointer;font-family:var(--font-body);font-size:0.95rem;font-weight:bold;transition:background 0.2s,transform 0.2s;" onmouseover="this.style.background='var(--btn-hover)';this.style.transform='scale(1.03)'" onmouseout="this.style.background='var(--btn-bg)';this.style.transform='scale(1)'">About the Story</button>
+ </div>
+ <h2 class="chapter-list-title">Chapters</h2>
+ `;
+
+ for (const ch of chapters) {
+ if (ch.act && ch.act !== actLabel) {
+ actLabel = ch.act;
+ html += `<div class="act-header">${ch.act}</div>`;
+ }
+ if (ch.done) {
+ html += `
+ <div class="chapter-item available" onclick="navigate('chapter',${ch.num})">
+ <div class="ch-num">${ch.num}</div>
+ <div class="ch-info">
+ <div class="ch-title">Chapter ${ch.num}: ${ch.title}</div>
+ <div class="ch-meta">~6,000 words · Read now</div>
+ </div>
+ </div>`;
+ } else {
+ html += `
+ <div class="chapter-item unavailable">
+ <div class="ch-num">${ch.num}</div>
+ <div>
+ <div class="ch-title">Chapter ${ch.num}: ${ch.title}</div>
+ <span class="ch-badge">Not finished yet</span>
+ </div>
+ </div>`;
+ }
+ }
+
+ document.getElementById('appContainer').innerHTML = html;
+ updateProgress();
+ document.getElementById('backToTop').classList.remove('visible');
+}
+
+// === ABOUT PAGE ===
+function renderAbout() {
+ const html = `
+ <div class="about-page">
+ <div class="about-hero">
+ <h1>About the Story</h1>
+ <div class="about-subtitle">A Comprehensive Guide to the World of PactSpire Chronicles</div>
+ </div>
+
+ <div class="about-card">
+ <h2>The World of Fiorgard</h2>
+ <p>In the world of <strong>Fiorgard</strong>, magic flows not from gods or bloodlines but from <em>pacts</em>, living oaths sworn between people, land, beasts, and spirits. Every bond is a source of power, and every promise carries consequence. When the ancient Emperor broke the primordial pact, every oath in the world shattered in an event known as the <strong>Fracture</strong>.</p>
+ <p>From the ruins rose the <strong>Seven Guilds</strong>, institutions dedicated to rebuilding trust one vow at a time. Each Guild governs a domain of pact-craft: from martial oaths that forge warriors to healing bonds that mend the wounded, from trade pacts that sustain economies to scholarly vows that preserve knowledge. Together, they hold Fiorgard together against the ever-present threat of another Fracture.</p>
+ <h3>The Seven Guilds</h3>
+ <p>The Guilds serve as the pillars of post-Fracture society. They train pact-bearers, adjudicate oath-disputes, and maintain the delicate balance of power that prevents any single force from breaking the world again. Each Guild has its own traditions, its own territories, and its own vision for Fiorgard's future, and their competing interests are a constant source of tension.</p>
+ </div>
+
+ <div class="about-card">
+ <h2>PactSpire Academy</h2>
+ <p>At the heart of this fragile order stands <strong>PactSpire</strong>, a living Academy unlike any other. Built from the accumulated oaths of generations of students, its halls shift and its walls breathe. Classrooms rearrange themselves overnight. Staircases lead to different destinations depending on who walks them. The entire structure is a single, vast pact, and every student who swears an oath within its walls adds to its power.</p>
+ <p>Here, at sixteen, every soul awakens to its true <strong>Class</strong>, a manifestation of their deepest self, shaped by lineage, temperament, and the pacts they are destined to forge. Some become Sentinels, sworn to protect. Others become Jesters, wielding improvisational magic drawn from performance and wit. Still others awaken as Alchemists, Scribes, Wardens, and more, each Class a unique expression of the oath-bond.</p>
+ <p>But PactSpire is more than a school. It is a proving ground, a political chessboard, and a pressure cooker. Seven students from different Guilds, different backgrounds, and different Classes are about to collide, and their bonds will reshape the Academy, and perhaps the world.</p>
+ </div>
+
+ <div class="about-card">
+ <h2>The Protagonists</h2>
+ <div class="about-protagonists">
+ <div class="about-protagonist">
+ <span class="ap-name">Tomas Herdsson</span>
+ <span class="ap-class">Totemic Sentinel · Veridale</span>
+ <p>A sheep farmer's son from the poorest pastoral reaches of Veridale, Tomas never expected to awaken anything more than a shepherd's pact. Instead, he manifests a spectral ram guardian, raw, unrefined power that marks him as a Totemic Sentinel. His Class is built for protection: the ram absorbs damage meant for others, his stamina is superhuman, and his defensive auras can shield entire formations. With no resources, no connections, and no understanding of Academy politics, Tomas knows exactly one thing: how to stand in front of things and refuse to move. His stubbornness is both his greatest weapon and his deepest flaw. Deep down, he fears being seen as nothing more than a farm boy playing at heroism.</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Flynn Wintersbloom</span>
+ <span class="ap-class">Cantrip Jester · Miravale</span>
+ <p>Heir to a prestigious Apothecarian dynasty, Flynn was raised to be a physician: precise, methodical, respectable. Instead, he awakens as a Cantrip Jester, a Stage Class whose magic flows through performance, improvisation, and showmanship. His abilities, Quick-Cast, Illusion Weave, and the rare Reality Blur, are technically trivial to his family, yet they hold unprecedented potential in battlefield medicine: instant stabilization spells, temporary wound-sealing, a healing style that thrives in emergency chaos. In a family of doctors, he is a performer. Behind the wit and the flourishes is a young man desperate to be taken seriously, and terrified that his father might be right.</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Renn Ashvale</span>
+ <span class="ap-class">Pyromancer · Drakengard</span>
+ <p>Born into Drakengard's warrior aristocracy, Renn embodies everything Tomas is not: wealth, training, and the unshakeable confidence of someone who has been told he is exceptional since birth. His Pyromancer Class burns hot and bright, pure offensive power forged in fire. As Tomas's training rival, he is dismissive of the shepherd, but his arrogance masks genuine skill and a warrior's code that demands he respect anyone who can stand against him. The question Renn won't ask aloud: is he strong because of his bloodline, or despite it?</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Sera Thornwell</span>
+ <span class="ap-class">Terra-Mage · Thornwood</span>
+ <p>The oldest of the cohort, Sera's enrollment was delayed by years, not months. A survivor of Thornwood's brutal frontier, she is the only student who has seen a Calamity with her own eyes and lived. Her Terra-Mage Class draws strength from stone, root, and soil, defensive and unyielding, shaped by necessity rather than choice. Quiet to the point of invisibility, watchful as a sentinel, she carries scars no one asks about. When the cohort finally faces a real Calamity, Sera will be the one who does not flinch, because she has done this before, alone, and survived.</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Ivy Belladonna</span>
+ <span class="ap-class">Runewright · Alchemist · Ashfall</span>
+ <p>A prodigy from Ashfall's contract-obsessed forge culture, Ivy is Flynn's academic rival and the kind of student the Wintersbloom family wished they had produced. Her dual Class, Runewright and Alchemist, combines inscription magic with potion-craft, making her a walking arsenal of prepared miracles. She is precise where Flynn improvises, methodical where he experiments, and furious where he hides behind wit. The tension between them is personal: she represents the life Flynn rejected, and Flynn represents the freedom she has never allowed herself to want.</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Wren Vesper</span>
+ <span class="ap-class">Shadow-Mage · Vespermarch</span>
+ <p>If information is power, Wren is the most powerful student at PactSpire, and the hardest to read. Hailing from Vespermarch, a kingdom that abolished its throne and operates in whispers, Wren's Shadow-Mage Class grants mastery over stealth, misdirection, and the Vanishers' Haze. Wren knows everyone's secrets, debts, and fears, and trades them like currency. But Wren's own allegiance is the deepest mystery: quietly cultivated by Magister Silas Thorne, Wren may be a Silent Choir operative, a double agent feeding false information to both sides, or simply a survivor playing the only game that has ever kept Vespermarch's people alive.</p>
+ </div>
+ <div class="about-protagonist">
+ <span class="ap-name">Kael Highwind</span>
+ <span class="ap-class">Aero-Mage · Beast-Tamer · Stormhollow</span>
+ <p>The heart of the cohort and its most reckless soul, Kael arrives at PactSpire bonded to a juvenile Storm-Hawk, a living extension of his dual Class: Aero-Mage and Beast-Tamer. He laughs too loud, charges in first, and asks questions never. But beneath the comic relief is something flickering and deadly: Stormhollow's wild sky-magic, untamed and unpredictable. When Sera saves his life during the Solstice Vigil, Kael's gratitude reshapes the cohort's dynamics, and when the hawk screams in the dark, everyone listens, because it sees what Kael refuses to acknowledge.</p>
+ </div>
+ </div>
+ </div>
+
+ <div class="about-card">
+ <h2>The Three Seasons</h2>
+ <p>The story unfolds across three seasons at PactSpire Academy, each marking a distinct phase in the journey, and in the relationship between Tomas and Flynn.</p>
+ <div class="about-seasons">
+ <div class="about-season">
+ <span class="as-name">ACT I, Spring: The Arriving</span>
+ <span class="as-range">Chapters 1–5</span>
+ <p>New students arrive at PactSpire and awaken to their Classes. Tomas and Flynn meet as rivals from opposing Guilds, their clashes echoing the larger tensions between their Houses. Through challenges, quiet lessons, and the sacred rite of Pact-Planting, the seeds of something deeper than rivalry are sown, even as the world outside the Academy walls grows restless.</p>
+ </div>
+ <div class="about-season">
+ <span class="as-name">ACT II, Summer/Autumn: The Burning</span>
+ <span class="as-range">Chapters 6–11</span>
+ <p>As the seasons turn, Tomas and Flynn are thrust into forced proximity, field exercises, alchemical duels, sacred vigils, and binding rituals that strip away their defenses. Old wounds surface. A mysterious letter threatens everything. And through the crucible of summer's heat and autumn's harvest, rivalry transforms into something neither of them expected, and neither can easily name.</p>
+ </div>
+ <div class="about-season">
+ <span class="as-name">ACT III, Winter: The Breaking</span>
+ <span class="as-range">Chapters 12–17</span>
+ <p>Winter brings darkness to PactSpire. An ancient oath resurfaces, connected to the original Fracture. Tomas and Flynn's investigation leads them into the Academy's buried history, the Headmaster's secrets, and a conspiracy that threatens to break the world anew. In the final stand, every pact will be tested, and the bond between two unlikely allies may be the only thing standing between Fiorgard and another catastrophic shattering.</p>
+ </div>
+ </div>
+ </div>
+
+ <div class="about-card">
+ <h2>How This Story Was Made</h2>
+
+ <h3>Superpowers: Brainstorming Skill</h3>
+ <p>The foundation of Fiorgard was built using <strong>Superpowers</strong> (<a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">obra/superpowers</a>), an open-source agentic skills framework by Jesse Vincent. Its <strong>brainstorming skill</strong> guided the entire world-building process, a structured, Socratic dialogue that explored the magic system (pacts, the Fracture, Seven Guilds), character archetypes (Tomas the Sentinel, Flynn the Jester), narrative structure (three-act seasonal arc), and the core thematic vision before a single chapter was written. No code, just design, and then a spec document that became the world bible.</p>
+
+ <h3>Marvis: Website &amp; Story Building</h3>
+ <p>Powered by <strong>Tencent Hunyuan Hy3</strong> and <strong>DeepSeek-V4 Pro</strong>, the Marvis desktop agent served as both co-author and engineer. It authored the <strong>world bible</strong> (a 281-line foundational document) and all <strong>17 story chapters</strong> (~307K characters total), maintaining consistent character voices, magic mechanics, and narrative continuity across the entire three-act arc. On the engineering side, Marvis built the <strong>full single-page application</strong>, Liquid Glass UI, font system, auto-scroll, alignment controls, theme switching, chapter navigation, mobile responsiveness, and the about page, into a single zero-dependency HTML file served from localhost.</p>
+
+ <h3>ChatGPT: Cover &amp; Chapter Illustrations</h3>
+ <p>All visual artwork, the <strong>homepage cover</strong> and <strong>17 chapter cover images</strong>, was generated by <strong>OpenAI's ChatGPT</strong> image generation. Each image was guided by a detailed scene prompt that matched the tone, composition, and key visual motifs of its corresponding chapter, ensuring visual consistency across the entire reading experience.</p>
+ </div>
+
+ <div style="text-align:center;margin-top:12px;">
+ <button class="about-back-btn" onclick="navigate('home')">← Back to Chapters</button>
+ </div>
+ </div>
+ `;
+
+ document.getElementById('appContainer').innerHTML = html;
+ updateProgress();
+ document.getElementById('backToTop').classList.remove('visible');
+}
+
+// === CHAPTER PAGE ===
+async function renderChapter(num) {
+ const ch = chapters[num-1];
+ let prevNum = num - 1;
+ let nextNum = num + 1;
+ let prevCh = chapters[prevNum - 1];
+ let nextCh = chapters[nextNum - 1];
+ let prevDisabled = (!prevCh || !prevCh.done) ? 'disabled' : '';
+ let nextDisabled = (!nextCh || !nextCh.done) ? 'disabled' : '';
+
+ document.getElementById('appContainer').innerHTML = `
+ <div class="chapter-page">
+ <div class="ch-header">
+ <h1>Chapter ${ch.num}: ${ch.title}</h1>
+ <div class="ch-subtitle">${ch.act || 'PactSpire Chronicles'}</div>
+ </div>
+ <img src="${getCoverPath(num)}" class="chapter-cover" onerror="this.style.display='none'" alt="Chapter ${num} Cover" loading="lazy">
+ <div class="ch-content" id="chContent" style="text-align:center;padding:60px 0;">
+ <p style="color:var(--text-secondary);">Loading chapter…</p>
+ </div>
+ <div class="ch-nav">
+ <button onclick="navigate('chapter',${prevNum})" ${prevDisabled}>← Previous</button>
+ <button onclick="navigate('home')" title="Contents">&#8962;</button>
+ <button onclick="navigate('chapter',${nextNum})" ${nextDisabled}>Next →</button>
+ </div>
+ </div>
+ `;
+ updateProgress();
+
+ const contentHTML = await loadChapter(num);
+ document.getElementById('chContent').innerHTML = contentHTML;
+ applyAlignmentToContent();
+ updateProgress();
+ persist('pactspire_lastchapter', num);
+}
+
+// === READING PROGRESS ===
+function updateProgress() {
+ const winH = window.innerHeight;
+ const docH = document.documentElement.scrollHeight;
+ const scrollTop = window.scrollY;
+ const maxScroll = docH - winH;
+ const pct = maxScroll > 0 ? Math.min(100, (scrollTop / maxScroll) * 100) : 0;
+ document.getElementById('progressBar').style.width = pct + '%';
+
+ if (scrollTop > 400) {
+ document.getElementById('backToTop').classList.add('visible');
+ } else {
+ document.getElementById('backToTop').classList.remove('visible');
+ }
+ // Liquid Glass scroll adaptation
+ const fb = document.getElementById('floatingBar');
+ if (scrollTop > 80) fb.classList.add('scrolled');
+ else fb.classList.remove('scrolled');
+}
+
+// === FONT SIZE ===
+function adjustFontSize(delta) {
+ fontSizeRem = Math.max(12, Math.min(26, fontSizeRem + delta));
+ document.documentElement.style.fontSize = fontSizeRem + 'px';
+ persist('pactspire_fontsize', fontSizeRem);
+ const valEl = document.getElementById('fdmSizeVal');
+ if (valEl) valEl.textContent = fontSizeRem + 'px';
+}
+
+// === FONT FAMILY ===
+const FONT_CLASS_PREFIX = 'font-';
+function setFont(font) {
+ document.body.className = document.body.className.replace(/\bfont-\S+/g, '').trim();
+ document.body.classList.add(FONT_CLASS_PREFIX + font);
+ persist('pactspire_font', font);
+}
+
+// === FONT DROPDOWN ===
+function toggleFontDropdown() {
+ const menu = document.getElementById('fontDropdownMenu');
+ const btn = document.getElementById('fontBtn');
+ const isOpen = menu.classList.toggle('visible');
+ btn.classList.toggle('active', isOpen);
+ // Close other menus
+ document.getElementById('alignDropdownMenu').classList.remove('visible');
+ document.getElementById('alignBtn').classList.remove('active');
+ document.getElementById('autoScrollMenu').classList.remove('visible');
+ document.getElementById('autoScrollBtn').classList.remove('active');
+}
+
+function selectFont(font, el) {
+ setFont(font);
+ document.querySelectorAll('.font-dropdown-menu .fdm-opt').forEach(o => o.classList.remove('selected'));
+ el.classList.add('selected');
+}
+
+function highlightFontPanel(font) {
+ document.querySelectorAll('.font-dropdown-menu .fdm-opt').forEach(o => o.classList.remove('selected'));
+ const opt = document.querySelector('.font-dropdown-menu .fdm-opt[data-font="' + font + '"]');
+ if (opt) opt.classList.add('selected');
+}
+
+document.addEventListener('click', function(e) {
+ const panel = document.getElementById('fontDropdownMenu');
+ const btn = document.getElementById('fontBtn');
+ if (panel && panel.classList.contains('visible') && !panel.contains(e.target) && !btn.contains(e.target)) {
+ panel.classList.remove('visible');
+ btn.classList.remove('active');
+ }
+ const alMenu = document.getElementById('alignDropdownMenu');
+ const alBtn = document.getElementById('alignBtn');
+ if (alMenu && alMenu.classList.contains('visible') && !alMenu.contains(e.target) && !alBtn.contains(e.target)) {
+ alMenu.classList.remove('visible');
+ alBtn.classList.remove('active');
+ }
+ const asMenu = document.getElementById('autoScrollMenu');
+ const asBtn = document.getElementById('autoScrollBtn');
+ if (asMenu && asMenu.classList.contains('visible') && !asMenu.contains(e.target) && !asBtn.contains(e.target)) {
+ asMenu.classList.remove('visible');
+ asBtn.classList.remove('active');
+ }
+});
+
+// === THEME ===
+function toggleTheme() {
+ const current = document.body.getAttribute('data-theme');
+ setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+function setTheme(theme) {
+ document.body.setAttribute('data-theme', theme);
+ document.getElementById('themeBtn').innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
+ persist('pactspire_theme', theme);
+}
+
+// === EVENT LISTENERS ===
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// === ALIGNMENT ===
+let currentAlignment = 'justify';
+
+function toggleAlignMenu() {
+ const menu = document.getElementById('alignDropdownMenu');
+ const btn = document.getElementById('alignBtn');
+ const isOpen = menu.classList.toggle('visible');
+ btn.classList.toggle('active', isOpen);
+ // Close other menus
+ document.getElementById('fontDropdownMenu').classList.remove('visible');
+ document.getElementById('fontBtn').classList.remove('active');
+ document.getElementById('autoScrollMenu').classList.remove('visible');
+ document.getElementById('autoScrollBtn').classList.remove('active');
+}
+
+function setAlignment(align, el) {
+ currentAlignment = align;
+ // Apply to chapter content
+ const content = document.querySelector('.ch-content');
+ if (content) {
+ content.style.textAlign = align;
+ }
+ // Highlight selected in dropdown
+ document.querySelectorAll('.align-dropdown-menu .adm-btn').forEach(b => b.classList.remove('selected'));
+ el.classList.add('selected');
+ // Close dropdown
+ document.getElementById('alignDropdownMenu').classList.remove('visible');
+ document.getElementById('alignBtn').classList.remove('active');
+ persist('pactspire_align', align);
+}
+
+function applyAlignmentToContent() {
+ const content = document.querySelector('.ch-content');
+ if (content) {
+ content.style.textAlign = currentAlignment;
+ }
+}
+
+// === AUTO-SCROLL ===
+let autoScrollActive = false;
+let scrollSpeed = 50; // px/s
+let scrollInterval = null;
+
+function toggleAutoScrollMenu() {
+ const menu = document.getElementById('autoScrollMenu');
+ const btn = document.getElementById('autoScrollBtn');
+ const isOpen = menu.classList.toggle('visible');
+ btn.classList.toggle('active', isOpen);
+ // Close other menus
+ document.getElementById('fontDropdownMenu').classList.remove('visible');
+ document.getElementById('fontBtn').classList.remove('active');
+ document.getElementById('alignDropdownMenu').classList.remove('visible');
+ document.getElementById('alignBtn').classList.remove('active');
+}
+
+function startAutoScroll() {
+ const menu = document.getElementById('autoScrollMenu');
+ const btn = document.getElementById('autoScrollBtn');
+ menu.classList.remove('visible');
+ btn.classList.remove('active');
+
+ if (autoScrollActive) {
+ stopAutoScroll();
+ return;
+ }
+
+ autoScrollActive = true;
+ btn.innerHTML = '&#9632;'; // stop icon
+ btn.classList.add('active');
+
+ // Update start/stop button
+ document.getElementById('asmStartStop').textContent = 'Stop Auto-Scroll';
+ document.getElementById('asmStartStop').setAttribute('onclick', 'stopAutoScroll()');
+
+ // Start scroll loop at ~60fps (recalculate step each frame for live speed changes)
+ scrollInterval = setInterval(() => {
+ window.scrollBy(0, scrollSpeed / 60);
+ }, 16);
+}
+
+function stopAutoScroll() {
+ if (scrollInterval) {
+ clearInterval(scrollInterval);
+ scrollInterval = null;
+ }
+ autoScrollActive = false;
+ const btn = document.getElementById('autoScrollBtn');
+ btn.innerHTML = '&#9654;'; // play icon
+ btn.classList.remove('active');
+ document.getElementById('asmStartStop').textContent = 'Start Auto-Scroll';
+ document.getElementById('asmStartStop').setAttribute('onclick', 'startAutoScroll()');
+ const menu = document.getElementById('autoScrollMenu');
+ menu.classList.remove('visible');
+ btn.classList.remove('active');
+}
+
+function adjustScrollSpeed(delta) {
+ scrollSpeed = Math.max(10, Math.min(200, scrollSpeed + delta));
+}
+
+// Click anywhere to stop auto-scroll (but not on floating bar buttons or menu)
+document.addEventListener('click', function(e) {
+ if (!autoScrollActive) return;
+ const fb = document.getElementById('floatingBar');
+ const menu = document.getElementById('autoScrollMenu');
+ if (fb && fb.contains(e.target)) return;
+ if (menu && menu.contains(e.target)) return;
+ stopAutoScroll();
+});
+window.addEventListener('hashchange', () => {
+ const hash = location.hash.replace('#/', '') || 'home';
+ if (hash === 'home') {
+ currentPage = 'home';
+ renderHome();
+ updateChapterLabel(null);
+ window.scrollTo({top: 0, behavior: 'instant'});
+ updateProgress();
+ } else if (hash === 'about') {
+ currentPage = 'about';
+ renderAbout();
+ updateChapterLabel('about');
+ window.scrollTo({top: 0, behavior: 'instant'});
+ updateProgress();
+ } else if (hash.startsWith('chapter/')) {
+ const num = parseInt(hash.replace('chapter/', ''));
+ const ch = chapters.find(c => c.num === num);
+ if (ch && ch.done) navigate('chapter', num);
+ else navigate('home');
+ }
+});
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
